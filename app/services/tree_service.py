@@ -1,6 +1,7 @@
 import tkinter as tk
-from app.model.node import Node
+
 from app.model.game_ui import UI
+from app.model.node import Node
 
 # Константы для значений узлов
 WIN_VALUE = 1
@@ -59,22 +60,30 @@ def fill_game_tree(root: Node, game: UI) -> None:
 
 def start():
     """Основная функция инициализации и выполнения программы"""
-    # Инициализация игрового дерева и интерфейса
-    root_tree = Node()
-    game_window = tk.Tk()
-    game = UI(game_window)
+    root_tree = Node.load()
 
-    # Максимальное количество итераций для безопасности
-    MAX_ITERATIONS = 100000
-    iteration = 0
+    if not root_tree:
+        root_tree = Node()
 
-    # Построение дерева решений
-    while root_tree.value is None and iteration < MAX_ITERATIONS:
-        game.reset_game()
-        fill_game_tree(root_tree, game)
-        iteration += 1
+        game_window = tk.Tk()
+        game = UI(game_window)
 
-    print(f"Построение дерева закончено за {iteration} итераций")
+        # Максимальное количество итераций для безопасности
+        MAX_ITERATIONS = 100000
+        iteration = 0
+
+        # Построение дерева решений
+        while root_tree.value is None and iteration < MAX_ITERATIONS:
+            game.reset_game()
+            fill_game_tree(root_tree, game)
+            iteration += 1
+
+        print(f"Построение дерева закончено за {iteration} итераций")
+
+        root_tree.save()
+    else:
+        print(f"Дерево загружено с файла")
+
     print(root_tree)
 
 
