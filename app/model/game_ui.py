@@ -3,95 +3,114 @@ from tkinter import messagebox
 import random
 
 
+class SquareButton(tk.Canvas):
+    """Кастомный квадратный виджет для игрового поля"""
+
+    def __init__(self, master, text="", command=None, **kwargs):
+        super().__init__(master, **kwargs, highlightthickness=0)
+        self.command = command
+        self.text = text
+        self.bind("<Configure>", self._draw_square)
+        self.bind("<Button-1>", self._on_click)
+
+    def _draw_square(self, event=None):
+        self.delete("all")
+        size = min(self.winfo_width(), self.winfo_height())
+        self.create_rectangle(0, 0, size, size, fill="#f0f0f0", outline="black")
+        self.create_text(
+            size // 2, size // 2, text=self.text, font=("Arial", size // 2)
+        )
+
+    def _on_click(self, event):
+        if self.command:
+            self.command()
+
+    def update_text(self, text):
+        self.text = text
+        self._draw_square()
+
+
 class UI:
     def __init__(self, root, game_mode="CvC", on_mode_change=None):
-        """Инициализация иры и поля"""
         self.root = root
         self.root.title("Крестики-нолики")
 
-        # Настройка главного экрана
+        # Начальный размер окна
         self.root.geometry("400x500")
         self.root.minsize(400, 500)
-        self.root.grid_rowconfigure(1, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
 
-        # Центрирование содержимого
-        main_frame = tk.Frame(root)
-        main_frame.grid(row=1, column=0, sticky="nsew")
-        main_frame.grid_rowconfigure(1, weight=1)
-        main_frame.grid_columnconfigure(0, weight=1)
-
-        # Текущий игрок и режим игры
+        # Инициализация параметров игры
         self.current_player = "X"
         self.board = [""] * 9
         self.game_active = True
         self.waiting_for_computer = False
         self.game_mode = game_mode
         self.on_mode_change = on_mode_change
-        self.computer_speed = 1000  # Задержка между ходами компьютера в мс
+        self.computer_speed = 1000
+
+        # Основной контейнер
+        self.container = tk.Frame(root)
+        self.container.pack(expand=True, fill=tk.BOTH, padx=20, pady=20)
 
         # Информационная панель
         self.info_label = tk.Label(
-            main_frame,
-            text=self.get_status_text(),
-            font=("Arial", 16),  # Увеличенный шрифт
+            self.container, text=self.get_status_text(), font=("Arial", 16)
         )
-        self.info_label.grid(row=0, column=0, pady=(20, 10), sticky="n")
+        self.info_label.pack(pady=(0, 20))
 
-        # Фрейм для игрового поля
-        board_frame = tk.Frame(main_frame)
-        board_frame.grid(row=1, column=0, sticky="nsew")
+        # Контейнер для игрового поля
+        self.board_frame = tk.Frame(self.container)
+        self.board_frame.pack(expand=True)
 
-        # Настройка пропорций игрового поля
-        for i in range(3):
-            board_frame.grid_rowconfigure(i, weight=1)
-            board_frame.grid_columnconfigure(i, weight=1)
-
-        # Кнопки игрового поля с увеличенным размером
+        # Создание квадратных кнопок
         self.buttons = []
         for i in range(9):
-            button = tk.Button(
-                board_frame,
+            button = SquareButton(
+                self.board_frame,
                 text="",
-                font=("Arial", 32),  # Увеличенный шрифт
-                width=3,
-                height=1,
-                bg="#f0f0f0",
                 command=lambda idx=i: self.player_move(idx),
+                width=100,
+                height=100,
+                bg="#f0f0f0",
             )
-            button.grid(
-                row=i // 3,
-                column=i % 3,
-                padx=5,
-                pady=5,
-                sticky="nsew",  # Растягиваем кнопки
-            )
+            row, col = divmod(i, 3)
+            button.grid(row=row, column=col, padx=2, pady=2, sticky="nsew")
             self.buttons.append(button)
 
-        # Панель управления
-        control_frame = tk.Frame(main_frame)
-        control_frame.grid(row=2, column=0, pady=(20, 10), sticky="s")
+        # Настройка пропорций
+        for i in range(3):
+            self.board_frame.grid_rowconfigure(i, weight=1, uniform="board_row")
+            self.board_frame.grid_columnconfigure(i, weight=1, uniform="board_col")
 
-        # Увеличенные кнопки управления
+        # Панель управления
+        control_frame = tk.Frame(self.container)
+        control_frame.pack(pady=(20, 0))
+
+        # Кнопка новой игры
         tk.Button(
             control_frame,
             text="Новая игра",
-            command=self.reset_game,
+            command=self.new_game,
             font=("Arial", 12),
             padx=20,
-            pady=10,
+            pady=5,
         ).pack(side=tk.LEFT, padx=10)
 
+        # Кнопка смены режима
         tk.Button(
             control_frame,
             text="Сменить режим",
             command=self.change_mode,
             font=("Arial", 12),
             padx=20,
-            pady=10,
+            pady=5,
         ).pack(side=tk.LEFT, padx=10)
 
-        # Центрирование окна
+        # Горячие клавиши для полноэкранного режима (но без кнопки)
+        self.root.bind("<F11>", self.toggle_fullscreen)
+        self.root.bind("<Escape>", self.exit_fullscreen)
+
+        # Центрирование при первом открытии
         self.center_window()
 
         if self.game_mode == "CvC":
@@ -106,12 +125,29 @@ class UI:
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
         self.root.geometry(f"{width}x{height}+{x}+{y}")
 
+    def toggle_fullscreen(self, event=None):
+        """Переключение полноэкранного режима по F11"""
+        self.root.attributes("-fullscreen", not self.root.attributes("-fullscreen"))
+        self._adjust_layout()
+
+    def exit_fullscreen(self, event=None):
+        """Выход из полноэкранного режима по Escape"""
+        self.root.attributes("-fullscreen", False)
+        self._adjust_layout()
+
+    def _adjust_layout(self):
+        """Подгонка размера элементов при изменении окна"""
+        self.root.update_idletasks()
+        for button in self.buttons:
+            button._draw_square()
+
     def get_status_text(self):
+        """ВЫвод текста статуса игры"""
         if self.game_mode == "PvP":
             return f"Ход игрока {self.current_player}"
         elif self.game_mode == "PvC":
             return (
-                f'Ход: {"Ваш (Х)" if self.current_player == "X" else "Компьютер (О)"}'
+                f'Ход: {"Ваш (X)" if self.current_player == "X" else "Компьютер (O)"}'
             )
         else:
             return "Компьютер против компьютера"
@@ -130,15 +166,14 @@ class UI:
         self.waiting_for_computer = False
 
         for button in self.buttons:
-            button.config(text="")
+            button.update_text("")
+            button.config(state=tk.NORMAL if self.game_mode != "CvC" else tk.DISABLED)
+
+        # self.info_label.update_text("")
+        # self.info_label.config(state=tk.NORMAL)
 
     def new_game(self):
         self.reset_game()
-
-        self.info_label.config(
-            text="",
-            state=tk.NORMAL,
-        )
 
         self.info_label.config(text=self.get_status_text())
 
@@ -202,7 +237,7 @@ class UI:
     def make_move(self, idx, player):
         """Осуществление хода"""
         self.board[idx] = player
-        self.buttons[idx].config(text=player)
+        self.buttons[idx].update_text(player)
         self.current_player = "O" if player == "X" else "X"
         self.info_label.config(text=self.get_status_text())
 
