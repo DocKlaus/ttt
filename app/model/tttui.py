@@ -77,8 +77,7 @@ class TTTUI:
             text=f"Ход: {'Ваш (X)' if self.current_player == 'X' else 'Компьютер (O)'}"
         )
 
-    def check_game_over(self):
-        # Проверка победы
+    def check_win(self, show_message=True):
         win_combinations = [
             [0, 1, 2],
             [3, 4, 5],
@@ -89,7 +88,6 @@ class TTTUI:
             [0, 4, 8],
             [2, 4, 6],
         ]
-
         for combo in win_combinations:
             a, b, c = combo
             if self.board[a] == self.board[b] == self.board[c] != "":
@@ -98,10 +96,14 @@ class TTTUI:
                 self.game_active = False
                 return True
 
-        # Ничья
+        return False
+
+    def check_game_over(self):
+        if self.check_win():
+            return True
         if "" not in self.board:
-            messagebox.showinfo("Игра окончена", "Ничья!")
-            self.game_active = False
+            messagebox.showinfo("Game Over")
+            self.game_active = True
             return True
 
         return False
