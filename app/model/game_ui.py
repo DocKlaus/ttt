@@ -8,6 +8,20 @@ class UI:
         """Инициализация иры и поля"""
         self.root = root
         self.root.title("Крестики-нолики")
+
+        # Настройка главного экрана
+        self.root.geometry("400x500")
+        self.root.minsize(400, 500)
+        self.root.grid_rowconfigure(1, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+
+        # Центрирование содержимого
+        main_frame = tk.Frame(root)
+        main_frame.grid(row=1, column=0, sticky="nsew")
+        main_frame.grid_rowconfigure(1, weight=1)
+        main_frame.grid_columnconfigure(0, weight=1)
+
+        # Текущий игрок и режим игры
         self.current_player = "X"
         self.board = [""] * 9
         self.game_active = True
@@ -16,49 +30,81 @@ class UI:
         self.on_mode_change = on_mode_change
         self.computer_speed = 1000  # Задержка между ходами компьютера в мс
 
-        # История
+        # Информационная панель
         self.info_label = tk.Label(
-            root, text=self.get_status_text(), font=("Arial", 12)
+            main_frame,
+            text=self.get_status_text(),
+            font=("Arial", 16),  # Увеличенный шрифт
         )
-        self.info_label.grid(row=3, column=0, columnspan=3, pady=10)
+        self.info_label.grid(row=0, column=0, pady=(20, 10), sticky="n")
 
-        # Кнопки поля
-        self.buttons = []
-        for i in range(9):
-            button = tk.Button(
-                root,
-                text="",
-                font=("Arial", 24),
-                width=3,
-                height=1,
-                bg="#f0f0f0",
-                command=lambda idx=i: self.player_move(idx),
-            )
-            button.grid(row=1 + i // 3, column=i % 3, padx=2, pady=2)
-            self.buttons.append(button)
+        # Фрейм для игрового поля
+        board_frame = tk.Frame(main_frame)
+        board_frame.grid(row=1, column=0, sticky="nsew")
 
-        # Управление
-        control_frame = tk.Frame(root)
-        control_frame.grid(row=5, column=0, columnspan=3, pady=10)
+        # Настройка пропорций игрового поля
+        for i in range(3):
+            board_frame.grid_rowconfigure(i, weight=1)
+            board_frame.grid_columnconfigure(i, weight=1)
 
-        # Кнопка новой игры
-        tk.Button(
-            control_frame,
-            text="Новая игра",
-            command=self.new_game,
-            font=("Arial", 10),
-        ).pack(side=tk.LEFT, padx=5)
+            # Кнопки игрового поля с увеличенным размером
+            self.buttons = []
+            for i in range(9):
+                button = tk.Button(
+                    board_frame,
+                    text="",
+                    font=("Arial", 32),  # Увеличенный шрифт
+                    width=3,
+                    height=1,
+                    bg="#f0f0f0",
+                    command=lambda idx=i: self.player_move(idx),
+                )
+                button.grid(
+                    row=i // 3,
+                    column=i % 3,
+                    padx=5,
+                    pady=5,
+                    sticky="nsew",  # Растягиваем кнопки
+                )
+                self.buttons.append(button)
 
-        # Кнопка смены режима игры
-        tk.Button(
-            control_frame,
-            text="Сменить режим",
-            command=self.change_mode,
-            font=("Arial", 10),
-        ).pack(side=tk.LEFT, padx=5)
+            # Панель управления
+            control_frame = tk.Frame(main_frame)
+            control_frame.grid(row=2, column=0, pady=(20, 10), sticky="s")
 
-        if self.game_mode == "CvC":
-            self.start_computer_vs_computer()
+            # Увеличенные кнопки управления
+            tk.Button(
+                control_frame,
+                text="Новая игра",
+                command=self.reset_game,
+                font=("Arial", 12),
+                padx=20,
+                pady=10,
+            ).pack(side=tk.LEFT, padx=10)
+
+            tk.Button(
+                control_frame,
+                text="Сменить режим",
+                command=self.change_mode,
+                font=("Arial", 12),
+                padx=20,
+                pady=10,
+            ).pack(side=tk.LEFT, padx=10)
+
+            # Центрирование окна
+            self.center_window()
+
+            if self.game_mode == "CvC":
+                self.start_computer_vs_computer()
+
+    def center_window(self):
+        """Центрирует окно на экране"""
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
 
     def get_status_text(self):
         if self.game_mode == "PvP":
