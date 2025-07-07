@@ -60,11 +60,14 @@ class TTTUI:
             return
 
         # Рандомный ход
-        empty_cells = [i for i, cell in enumerate(self.board) if cell == ""]
+        empty_cells = self.get_available_fields()
         if empty_cells:
             move = random.choice(empty_cells)
             self.make_move(move, "O")
             self.check_game_over()
+
+    def get_available_fields(self):
+        return [i for i, cell in enumerate(self.board) if cell == ""]
 
     def make_move(self, idx, player):
         self.board[idx] = player
