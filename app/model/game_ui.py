@@ -86,15 +86,15 @@ class UI:
         for button in self.buttons:
             button.config(text="")
 
+    def new_game(self):
+        self.reset_game()
+
         self.info_label.config(
             text="",
             state=tk.NORMAL,
         )
 
         self.info_label.config(text=self.get_status_text())
-
-    def new_game(self):
-        self.reset_game()
 
         if self.game_mode == "CvC":
             self.start_computer_vs_computer()
