@@ -47,55 +47,55 @@ class UI:
             board_frame.grid_rowconfigure(i, weight=1)
             board_frame.grid_columnconfigure(i, weight=1)
 
-            # Кнопки игрового поля с увеличенным размером
-            self.buttons = []
-            for i in range(9):
-                button = tk.Button(
-                    board_frame,
-                    text="",
-                    font=("Arial", 32),  # Увеличенный шрифт
-                    width=3,
-                    height=1,
-                    bg="#f0f0f0",
-                    command=lambda idx=i: self.player_move(idx),
-                )
-                button.grid(
-                    row=i // 3,
-                    column=i % 3,
-                    padx=5,
-                    pady=5,
-                    sticky="nsew",  # Растягиваем кнопки
-                )
-                self.buttons.append(button)
+        # Кнопки игрового поля с увеличенным размером
+        self.buttons = []
+        for i in range(9):
+            button = tk.Button(
+                board_frame,
+                text="",
+                font=("Arial", 32),  # Увеличенный шрифт
+                width=3,
+                height=1,
+                bg="#f0f0f0",
+                command=lambda idx=i: self.player_move(idx),
+            )
+            button.grid(
+                row=i // 3,
+                column=i % 3,
+                padx=5,
+                pady=5,
+                sticky="nsew",  # Растягиваем кнопки
+            )
+            self.buttons.append(button)
 
-            # Панель управления
-            control_frame = tk.Frame(main_frame)
-            control_frame.grid(row=2, column=0, pady=(20, 10), sticky="s")
+        # Панель управления
+        control_frame = tk.Frame(main_frame)
+        control_frame.grid(row=2, column=0, pady=(20, 10), sticky="s")
 
-            # Увеличенные кнопки управления
-            tk.Button(
-                control_frame,
-                text="Новая игра",
-                command=self.reset_game,
-                font=("Arial", 12),
-                padx=20,
-                pady=10,
-            ).pack(side=tk.LEFT, padx=10)
+        # Увеличенные кнопки управления
+        tk.Button(
+            control_frame,
+            text="Новая игра",
+            command=self.reset_game,
+            font=("Arial", 12),
+            padx=20,
+            pady=10,
+        ).pack(side=tk.LEFT, padx=10)
 
-            tk.Button(
-                control_frame,
-                text="Сменить режим",
-                command=self.change_mode,
-                font=("Arial", 12),
-                padx=20,
-                pady=10,
-            ).pack(side=tk.LEFT, padx=10)
+        tk.Button(
+            control_frame,
+            text="Сменить режим",
+            command=self.change_mode,
+            font=("Arial", 12),
+            padx=20,
+            pady=10,
+        ).pack(side=tk.LEFT, padx=10)
 
-            # Центрирование окна
-            self.center_window()
+        # Центрирование окна
+        self.center_window()
 
-            if self.game_mode == "CvC":
-                self.start_computer_vs_computer()
+        if self.game_mode == "CvC":
+            self.start_computer_vs_computer()
 
     def center_window(self):
         """Центрирует окно на экране"""
