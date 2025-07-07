@@ -10,6 +10,7 @@ class TTTUI:
         self.current_player = "X"  # X - игрок, O - компьютер
         self.board = [""] * 9
         self.game_active = True
+        self.waiting_for_computer = False
 
         # История
         self.info_label = tk.Label(root, text="Ваш ход (X)", font=("Arial", 12))
@@ -44,12 +45,19 @@ class TTTUI:
         self.info_label.config(text="Ваш ход (X)")
 
     def player_move(self, idx):
-        if not self.game_active or self.board[idx] != "":
-            if not self.game_active:
-                self.info_label.config("Конец")
-            else:
+        if (
+            not self.game_active
+            or self.waiting_for_computer
+            or self.board[idx] != ""
+            or self.current_player != "X"
+        ):
+            if self.waiting_for_computer:
+                self.info_label.config(text="Computer moves")
+            elif self.current_player != "X":
+                self.info_label.config(text="Not players move")
+            elif self.board[idx] != "":
                 self.info_label.config(text=f"Клетка {idx + 1} уже занята!")
-                return
+            return
 
         self.make_move(idx, "X")
         if not self.check_game_over():
@@ -102,7 +110,7 @@ class TTTUI:
         if self.check_win():
             return True
         if "" not in self.board:
-            messagebox.showinfo("Game Over")
+            messagebox.showinfo("Игра окончена", "Ничья")
             self.game_active = True
             return True
 
