@@ -35,12 +35,11 @@ def fill_game_tree(root: Node, game: TTTUI) -> None:
             continue
 
         # Симулируем ход
-        current_player = game.current_player
-        game.make_move(child.position, current_player)
+        game.make_move(child.position, game.current_player)
 
         # Проверка условий окончания игры
         is_win = game.check_win(False)
-        is_draw = game.check_game_over()
+        is_draw = game.check_game_over(False)
 
         if is_win:
             child.value = WIN_VALUE
