@@ -1,6 +1,6 @@
 import tkinter as tk
 from app.model.node import Node
-from app.model.tttui import TTTUI
+from app.model.game_ui import UI
 
 # Константы для значений узлов
 WIN_VALUE = 1
@@ -8,7 +8,7 @@ DRAW_VALUE = 0.5
 LOSE_VALUE = 0
 
 
-def fill_game_tree(root: Node, game: TTTUI) -> None:
+def fill_game_tree(root: Node, game: UI) -> None:
     """Рекурсивно заполняет дерево игровых состояний.
 
     Args:
@@ -62,7 +62,7 @@ def start():
     # Инициализация игрового дерева и интерфейса
     root_tree = Node()
     game_window = tk.Tk()
-    game = TTTUI(game_window)
+    game = UI(game_window)
 
     # Максимальное количество итераций для безопасности
     MAX_ITERATIONS = 100000

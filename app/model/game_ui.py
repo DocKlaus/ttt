@@ -4,7 +4,7 @@ import random
 
 
 class UI:
-    def __init__(self, root, game_mode, on_mode_change=None):
+    def __init__(self, root, game_mode="CvC", on_mode_change=None):
         """Инициализация иры и поля"""
         self.root = root
         self.root.title("Крестики-нолики")
@@ -45,7 +45,7 @@ class UI:
         tk.Button(
             control_frame,
             text="Новая игра",
-            command=self.reset_game,
+            command=self.new_game,
             font=("Arial", 10),
         ).pack(side=tk.LEFT, padx=5)
 
@@ -92,6 +92,9 @@ class UI:
         )
 
         self.info_label.config(text=self.get_status_text())
+
+    def new_game(self):
+        self.reset_game()
 
         if self.game_mode == "CvC":
             self.start_computer_vs_computer()
