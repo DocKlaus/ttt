@@ -3,46 +3,7 @@ from tkinter import messagebox
 import random
 
 
-class GameModeSelection:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Выбор режима игры")
-        self.selected_mode = None
-
-        tk.Label(self.root, text="Выберите режим игры:", font=("Arial", 14)).pack(
-            pady=10
-        )
-
-        modes = [
-            ("Игрок против Игрока", "PvP"),
-            ("Игрок против Компьютера", "PvC"),
-            ("Компьютер против Компьютера", "CvC"),
-        ]
-
-        self.mode = tk.StringVar(value="PvP")
-
-        for text, mode in modes:
-            tk.Radiobutton(
-                self.root, text=text, variable=self.mode, value=mode, font=("Arial", 12)
-            ).pack(anchor=tk.W, padx=20, pady=20)
-
-        tk.Button(
-            self.root,
-            text="Начать игру",
-            command=self.start_game,
-            font=("Arial", 12),
-            bg="#4CAF50",
-            fg="#000000",
-        ).pack(pady=20)
-
-        self.root.mainloop()
-
-    def start_game(self):
-        self.selected_mode = self.mode.get()
-        self.root.destroy()
-
-
-class TTTUI:
+class UI:
     def __init__(self, root, game_mode):
         """Инициализация иры и поля"""
         self.root = root
@@ -234,13 +195,6 @@ class TTTUI:
             return True
 
         return False
-
-
-def start_game():
-    mode_selection = GameModeSelection()
-    root = tk.Tk()
-    game = TTTUI(root, mode_selection.selected_mode)
-    root.mainloop()
 
 
 # start_game()
