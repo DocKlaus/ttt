@@ -3,14 +3,23 @@ from tkinter import messagebox
 import random
 
 
+class GameModeSelection:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Выбор режима игры")
+        self.selected_mode = None
+
+
 class TTTUI:
     def __init__(self, root):
+        """Инициализация иры и поля"""
         self.root = root
         self.root.title("Крестики-нолики")
         self.current_player = "X"  # X - игрок, O - компьютер
         self.board = [""] * 9
         self.game_active = True
         self.waiting_for_computer = False
+        self.game_mode = "PvP"  # По умолчанию игрок-игрок
 
         # История
         self.info_label = tk.Label(root, text="Ваш ход (X)", font=("Arial", 12))
@@ -36,7 +45,12 @@ class TTTUI:
             row=4, column=0, columnspan=3
         )
 
+    def change_mode(self):
+        """Изменение режима игры"""
+        pass
+
     def reset_game(self):
+        """Играть заново"""
         self.current_player = "X"
         self.board = [""] * 9
         self.game_active = True
@@ -45,6 +59,7 @@ class TTTUI:
         self.info_label.config(text="Ваш ход (X)")
 
     def player_move(self, idx):
+        """Ход игрока"""
         if (
             not self.game_active
             or self.waiting_for_computer
@@ -64,6 +79,7 @@ class TTTUI:
             self.root.after(500, self.computer_move)
 
     def computer_move(self):
+        """Ход компьютера"""
         if not self.game_active:
             return
 
@@ -75,9 +91,11 @@ class TTTUI:
             self.check_game_over()
 
     def get_available_fields(self):
+        """Вывод доступных клеток"""
         return [i for i, cell in enumerate(self.board) if cell == ""]
 
     def make_move(self, idx, player):
+        """Осуществление хода"""
         self.board[idx] = player
         self.buttons[idx].config(text=player)
         self.current_player = "O" if player == "X" else "X"
@@ -85,7 +103,8 @@ class TTTUI:
             text=f"Ход: {'Ваш (X)' if self.current_player == 'X' else 'Компьютер (O)'}"
         )
 
-    def check_win(self, show_message=True):
+    def check_win(self, show_message=False):
+        """Проверка победы"""
         win_combinations = [
             [0, 1, 2],
             [3, 4, 5],
@@ -99,18 +118,21 @@ class TTTUI:
         for combo in win_combinations:
             a, b, c = combo
             if self.board[a] == self.board[b] == self.board[c] != "":
-                winner = "Вы" if self.board[a] == "X" else "Компьютер"
-                messagebox.showinfo("Игра окончена", f"{winner} победили!")
+                if show_message:
+                    winner = "Ты" if self.board[a] == "X" else "Компьютер"
+                    messagebox.showinfo("Игра окончена", f"{winner} победил!")
                 self.game_active = False
                 return True
 
         return False
 
-    def check_game_over(self):
+    def check_game_over(self, show_message=False):
+        """проверка окончания игры"""
         if self.check_win():
             return True
         if "" not in self.board:
-            messagebox.showinfo("Игра окончена", "Ничья")
+            if show_message:
+                messagebox.showinfo("Игра окончена", "Ничья")
             self.game_active = True
             return True
 
