@@ -4,7 +4,7 @@ import random
 
 
 class UI:
-    def __init__(self, root, game_mode):
+    def __init__(self, root, game_mode, on_mode_change=None):
         """Инициализация иры и поля"""
         self.root = root
         self.root.title("Крестики-нолики")
@@ -13,6 +13,7 @@ class UI:
         self.game_active = True
         self.waiting_for_computer = False
         self.game_mode = game_mode
+        self.on_mode_change = on_mode_change
         self.computer_speed = 1000  # Задержка между ходами компьютера в мс
 
         # История
@@ -72,7 +73,8 @@ class UI:
     def change_mode(self):
         """Изменение режима игры"""
         self.root.destroy()
-        start_game()
+        if self.on_mode_change:
+            self.on_mode_change()
 
     def reset_game(self):
         """Играть заново"""
@@ -195,6 +197,3 @@ class UI:
             return True
 
         return False
-
-
-# start_game()
