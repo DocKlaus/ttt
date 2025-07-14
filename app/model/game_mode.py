@@ -2,9 +2,22 @@ import tkinter as tk
 
 
 class GameModeSelection:
-    """Класс для создания окна режимов"""
+    """Создание окна, где выбирается режим игры:
+        1. Игрок против Игрока
+        2. Игрок против Компьютера
+        3. Компьютер против Компьютера
+    """
 
     def __init__(self):
+        """Инициализация:
+            1. Объект - root
+            2. Заголовок окна - root.title
+            3. Флаг выбора режима - selected_mode = None
+            4. Лейбл с текстом
+            5. Список вариантов режима
+            6. Создание объектов-кнопок для выбора режима
+            7. Кнопка начать игру
+        """
         self.root = tk.Tk()
         self.root.title("Выбор режима игры")
         self.selected_mode = None
@@ -38,5 +51,9 @@ class GameModeSelection:
         self.root.mainloop()
 
     def start_game(self):
+        """
+        Получаем выбранное значение.
+        Закрываем окно выбора режима.
+        """
         self.selected_mode = self.mode.get()
         self.root.destroy()
