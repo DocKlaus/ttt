@@ -7,35 +7,50 @@ class SquareButton(tk.Canvas):
     """Кастомный квадратный виджет для игрового поля"""
 
     def __init__(self, master, text="", command=None, **kwargs):
+        """
+        Параметры:
+            master — родительский виджет.
+            text — текст, который будет отображаться внутри кнопки (по умолчанию пустой).
+            command — функция, вызываемая при клике (по умолчанию None).
+            **kwargs — дополнительные параметры для Canvas (например, width, height, bg).
+
+        """
         super().__init__(master, **kwargs, highlightthickness=0)
         self.command = command
         self.text = text
+        # при изменении размера кнопки она автоматически перерисуется
         self.bind("<Configure>", self._draw_square)
+        # привязывает левый клик мыши (<Button-1>) к методу _on_click
         self.bind("<Button-1>", self._on_click)
 
     def _draw_square(self, event=None):
+        """Отрисовка кнопки"""
         self.delete("all")
+        # сторона квадрата определяется по минимальной при изменении размера окна
         size = min(self.winfo_width(), self.winfo_height())
+        # Рисуем квадрат
         self.create_rectangle(0, 0, size, size, fill="#f0f0f0", outline="black")
+        # Добавляем текст в центре
         self.create_text(
             size // 2, size // 2, text=self.text, font=("Arial", size // 2)
         )
 
     def _on_click(self, event):
+        """Обработка клика"""
         if self.command:
             self.command()
 
     def update_text(self, text):
+        """Обновляет текст и перерисовывает клетку с новым текстом"""
         self.text = text
         self._draw_square()
 
 
 class UI:
     def __init__(self, root, game_mode="CvC", on_mode_change=None):
+        # Настройка основного окна
         self.root = root
         self.root.title("Крестики-нолики")
-
-        # Начальный размер окна
         self.root.geometry("400x500")
         self.root.minsize(400, 500)
 
@@ -58,11 +73,11 @@ class UI:
         )
         self.info_label.pack(pady=(0, 20))
 
-        # Контейнер для игрового поля
+        # Игровое поле (3х3)
         self.board_frame = tk.Frame(self.container)
         self.board_frame.pack(expand=True)
 
-        # Создание квадратных кнопок
+        # Создание кнопок поля
         self.buttons = []
         for i in range(9):
             button = SquareButton(
@@ -173,6 +188,7 @@ class UI:
         # self.info_label.config(state=tk.NORMAL)
 
     def new_game(self):
+        """Запуск новой игры с предварительной очисткой поля"""
         self.reset_game()
 
         self.info_label.config(text=self.get_status_text())
@@ -181,6 +197,7 @@ class UI:
             self.start_computer_vs_computer()
 
     def start_computer_vs_computer(self):
+        """Запуск игры комп против компа"""
         self.game_active = True
         for button in self.buttons:
             button.config(state=tk.DISABLED)
@@ -222,6 +239,7 @@ class UI:
         self.continue_computer_game()
 
     def continue_computer_game(self):
+        """Продолжение игры коп против компа"""
         if self.game_mode == "CvC" and self.game_active:
             self.root.after(self.computer_speed, self.computer_move)
         else:
