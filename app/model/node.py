@@ -4,7 +4,7 @@ from config.settings import FILE_PATH
 
 
 class Node:
-    def __init__(self, position = None, value = None):
+    def __init__(self, position=None, value=None):
         self.position = position
         self.value = value
         self.children = []
@@ -19,7 +19,7 @@ class Node:
     def save(self):
         """Сохраняет объект в файл с обработкой ошибок записи"""
         try:
-            with open(FILE_PATH, 'wb') as file:
+            with open(FILE_PATH, "wb") as file:
                 pickle.dump(self, file)
                 print(f"Дерево загружено в файл")
             return True
@@ -32,7 +32,7 @@ class Node:
     def load():
         """Загружает объект из файла с обработкой ошибок"""
         try:
-            with open(FILE_PATH, 'rb') as file:
+            with open(FILE_PATH, "rb") as file:
                 return pickle.load(file)
         except FileNotFoundError:
             print(f"Файл {FILE_PATH} не найден.")

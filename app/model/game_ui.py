@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import messagebox
 import random
 
+from app.model.computer_logic import ComputerLogic
+
 
 class SquareButton(tk.Canvas):
     """Кастомный квадратный виджет для игрового поля"""
@@ -56,6 +58,7 @@ class UI:
 
         # Инициализация параметров игры
         self.current_player = "X"
+        self.current_move = None
         self.board = [""] * 9
         self.game_active = True
         self.waiting_for_computer = False
@@ -129,7 +132,11 @@ class UI:
         self.center_window()
 
         if self.game_mode == "CvC":
+            self.logic = ComputerLogic()
             self.start_computer_vs_computer()
+
+        if self.game_mode == "PvC":
+            self.logic = ComputerLogic()
 
     def center_window(self):
         """Центрирует окно на экране"""
@@ -194,7 +201,11 @@ class UI:
         self.info_label.config(text=self.get_status_text())
 
         if self.game_mode == "CvC":
+            self.logic = ComputerLogic()
             self.start_computer_vs_computer()
+
+        if self.game_mode == "PvC":
+            self.logic = ComputerLogic()
 
     def start_computer_vs_computer(self):
         """Запуск игры комп против компа"""
@@ -216,6 +227,7 @@ class UI:
             return
 
         self.make_move(idx, self.current_player)
+        self.current_move = idx
 
         if not self.check_game_over():
             if self.game_mode == "PvC" and self.current_player == "O":
@@ -229,17 +241,23 @@ class UI:
         if not self.game_active:
             return
 
-        # Рандомный ход
-        empty_cells = [i for i, cell in enumerate(self.board) if cell == ""]
-        if empty_cells:
-            move = random.choice(empty_cells)
-            self.make_move(move, self.current_player)
-            self.check_game_over()
-
+        self.logic.select_current_node(self.current_move)
+        position = self.logic.get_next_position()
+        self.make_move(position, self.current_player)
+        self.check_game_over()
         self.continue_computer_game()
 
+        # # Рандомный ход
+        # empty_cells = [i for i, cell in enumerate(self.board) if cell == ""]
+        # if empty_cells:
+        #     move = random.choice(empty_cells)
+        #     self.make_move(move, self.current_player)
+        #     self.check_game_over()
+        #
+        # self.continue_computer_game()
+
     def continue_computer_game(self):
-        """Продолжение игры коп против компа"""
+        """Продолжение игры"""
         if self.game_mode == "CvC" and self.game_active:
             self.root.after(self.computer_speed, self.computer_move)
         else:
